@@ -14,25 +14,29 @@ Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-surround'
 Plug 'connorholyday/vim-snazzy'
 Plug 'gcmt/wildfire.vim'
-Plug 'preservim/nerdcommenter'
+Plug 'tpope/vim-commentary'
 call plug#end()
 "-------------------------通用vim配置----------------------------------
 set backspace=2 " same as ":set backspace=indent,eol,start"
 set whichwrap=b,s,<,>,[,]
-:set list lcs=tab:\|\ "显示tab以区分space
+set nowrap "关闭折行
+set list lcs=tab:\|\ "显示tab以区分space
+set guifont=新宋体:h14:cGB2312:qDRAFT "用于windows gvim
 "解决文本乱码
 set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
 set termencoding=utf-8
 set encoding=utf-8
-set ambiwidth=double    "防止特殊符号无法显示
-set nobomb
 set fileformats=unix,dos    "新建文件默认使用LF作为换行
+" ambiwidth=double在nvim中有bug，先不设置
+" if !exists("g:vscode")
+    " set ambiwidth=double " 防止某些字符重叠，比如“♥” . if 语句防止vscode-nvim插件报错
+" endif
 
 "设置缩进为4空格等
 set shiftwidth=4    " Number of spaces to use for each step of (auto)indent.
 set tabstop=4
-set softtabstop=4	"按退格键时回退的空格数
-set expandtab		"tab变为空格，若要使用tab，则ctrl-v-tab
+set softtabstop=4   "按退格键时回退的空格数
+set expandtab       "tab变为空格，若要使用tab，则ctrl-v-tab
 autocmd BufRead *.md,*.tex setlocal sw=2 ts=2 sts=2
 
 if !isdirectory($HOME."/.vim/tmp/backup")
@@ -77,6 +81,7 @@ set clipboard=unnamedplus  "vim默认寄存器与剪切板共享,寄存器+(linu
 set cursorline
 set scrolloff=5
 setlocal foldmethod=syntax " za to toggle fold
+autocmd BufRead *.py,*.txt setlocal foldmethod=indent " for python fold
 set nofoldenable
 set foldlevel=99
 function! MyFoldText()
@@ -96,6 +101,7 @@ endif
 
 "-----------plugin setting-----------------------
 let g:airline#extensions#tabline#enabled = 1 "Automatically displays all buffers when there's only one tab open.
+autocmd BufRead *.pro setlocal commentstring=#\ %s
 
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
@@ -107,7 +113,6 @@ autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_
 let NERDTreeQuitOnOpen=1
 let g:NERDSpaceDelims = 1
 let g:NERDAltDelims_c = 1
-noremap gcc <Plug>NERDCommenterToggle
 noremap gw :NERDTree %<cr>
 noremap ge :NERDTreeToggle<cr>
 
@@ -140,10 +145,11 @@ autocmd InsertEnter * call Fcitx2zh()
 "---------------- key maps
 noremap <leader><leader> <esc>/<++>/<cr>:nohl<cr>c4l
 vnoremap <c-n> :normal
+cnoremap <c-v> <c-r>+
 " tabs
-" noremap <c-t> :tabe<cr>
-" noremap <c-left> :tabN<cr>
-" noremap <c-right> :tabn<cr>
+noremap <c-t> :tabe<cr>
+noremap <c-left> :tabN<cr>
+noremap <c-right> :tabn<cr>
 " buffers
 noremap g1 :bN<cr>
 noremap g2 :bn<cr>
@@ -154,29 +160,31 @@ noremap gr :%s///cg<left><left><left>
 
 " 模拟一般gui编辑器的操作
 noremap <c-s> :w<cr>
-inoremap <c-s> <esc>:w<cr>
 nnoremap <c-a> ggVG
+inoremap <c-s> <esc>:w<cr>
 inoremap <c-a> <esc>ggVG
+inoremap <c-v> <c-r>+
 vnoremap <c-c> y
 vnoremap <c-x> d
-inoremap <c-v> <c-r>+
-vnoremap <bs> "_di
+
 " '的作用是将剪切转化成删除
 " 用法举例：'S+ctrl-v 粘贴复制的内容
 noremap ' "_
+noremap Y y$
 " window
 noremap <c-h> <c-w>h
 noremap <c-l> <c-w>l
 noremap <c-j> <c-w>j
 noremap <c-k> <c-w>k
 " Unbind some useless/annoying default key bindings.
-noremap H :echo "you are press H"<cr>
+noremap H 5zh
 noremap K :echo "you are press K"<cr>
-noremap L :echo "you are press L"<cr>
+noremap L 5zl
 noremap U :echo "you are press U"<cr>
+noremap <c-u> 5k
+noremap <c-d> 5j
 nnoremap Q <nop>
 nnoremap q: <nop>
 " 使用undo时更加友好
 inoremap <c-w> <c-g>u<c-w>
 inoremap <c-u> <c-g>u<c-u>
-
